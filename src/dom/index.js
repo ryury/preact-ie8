@@ -66,10 +66,10 @@ export function setAccessor(node, name, old, value, isSvg) {
 		let useCapture = name !== (name=name.replace(/Capture$/, ''));
 		name = name.toLowerCase().substring(2);
 		if (value) {
-			if (!old) node.addEventListener(name, eventProxy, useCapture);
+			if (!old) addEventListener(node, name, eventProxy, useCapture);
 		}
 		else {
-			node.removeEventListener(name, eventProxy, useCapture);
+			removeEventListener(node, name, eventProxy, useCapture);
 		}
 		(node._listeners || (node._listeners = {}))[name] = value;
 	}
@@ -90,7 +90,6 @@ export function setAccessor(node, name, old, value, isSvg) {
 	}
 }
 
-
 /** Attempt to set a DOM property to the given value.
  *	IE & FF throw for certain property-value combinations.
  */
@@ -105,5 +104,21 @@ function setProperty(node, name, value) {
  *	@private
  */
 function eventProxy(e) {
-	return this._listeners[e.type](options.event && options.event(e) || e);
+	return (this._listeners || e.srcElement._listeners)[e.type](options.event && options.event(e) || e);
+}
+
+function addEventListener(node, name, eventProxy, useCapture) {
+	if (node.addEventListener) {
+		node.addEventListener(name, eventProxy, useCapture);
+	} else if (node.attachEvent) {
+		node.attachEvent(`on${name}`, eventProxy);
+	}
+}
+
+function removeEventListener(node, name, eventProxy, useCapture) {
+	if (node.removeEventListener) {
+		node.removeEventListener(name, eventProxy, useCapture);
+	} else if (node.detachEvent) {
+		node.detachEvent(`on${name}`, eventProxy);
+	}
 }

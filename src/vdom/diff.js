@@ -5,6 +5,7 @@ import { createNode, setAccessor } from '../dom/index';
 import { unmountComponent } from './component';
 import options from '../options';
 import { removeNode } from '../dom/index';
+import { isIE8 } from '../util/env';
 
 /** Queue of components that have been mounted and are awaiting componentDidMount */
 export const mounts = [];
@@ -88,7 +89,10 @@ function idiff(dom, vnode, context, mountAll, componentRoot) {
 			}
 		}
 
-		out[ATTR_KEY] = true;
+		// ie8 给 textNode 添加属性的时候会报错
+		if (!isIE8) {
+			out[ATTR_KEY] = true;
+		}
 
 		return out;
 	}
@@ -129,7 +133,11 @@ function idiff(dom, vnode, context, mountAll, componentRoot) {
 
 	if (props==null) {
 		props = out[ATTR_KEY] = {};
-		for (let a=out.attributes, i=a.length; i--; ) props[a[i].name] = a[i].value;
+		for (let a=out.attributes, i=a.length; i--; ) {
+			if (!/^__\w+$/.test(a[i].name)) {
+				props[a[i].name] = a[i].value;
+			}
+		}
 	}
 
 	// Optimization: fast-path for elements containing a single TextNode:

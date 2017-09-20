@@ -6,5 +6,9 @@ window.fireEvent = function triggerEvent (target, event, process) {
   target.fireEvent(`on${event}`, e)
 }
 
+jasmine.spy = jasmine.createSpy
+window.sinon = jasmine
+
+
 const testsContext = require.context('./', true, /\.spec$/)
 testsContext.keys().forEach(testsContext)

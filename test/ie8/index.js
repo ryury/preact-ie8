@@ -6,8 +6,32 @@ window.fireEvent = function triggerEvent (target, event, process) {
   target.fireEvent(`on${event}`, e)
 }
 
-jasmine.spy = jasmine.createSpy
-window.sinon = jasmine
+window.before = window.beforeAll
+window.after = window.afterAll
+
+const spy = window.spy = jasmine.createSpy
+window.sinon = { spy: spy }
+
+beforeAll (() => {
+  jasmine.addMatchers({
+    calledWith: jasmineRequire.toHaveBeenCalledWith(jasmine),
+    // property () {
+    //   return {
+    //     compare (actual) {
+    //       console.log(arguments)
+    //       return true
+    //     }
+    //   }
+    // },
+    calledOnce () {
+      return {
+        compare (actual) {
+          return jasmineRequire.toHaveBeenCalledTimes(jasmine)().compare(actual, 1)
+        }
+      }
+    }
+  })
+}) 
 
 
 const testsContext = require.context('./', true, /\.spec$/)

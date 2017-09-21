@@ -1,6 +1,7 @@
 import { SYNC_RENDER, NO_RENDER, FORCE_RENDER, ASYNC_RENDER, ATTR_KEY } from '../constants';
 import options from '../options';
 import { extend } from '../util';
+import { isIE8 } from '../util/env'
 import { enqueueRender } from '../render-queue';
 import { getNodeProps } from './index';
 import { diff, mounts, diffLevel, flushMounts, recollectNodeTree, removeChildren } from './diff';
@@ -136,7 +137,9 @@ export function renderComponent(component, opts, mountAll, isChild) {
 			}
 
 			if (initialBase || opts===SYNC_RENDER) {
-				if (cbase) cbase._component = null;
+				if (cbase && !(isIE8 && cbase.nodeType === 3)) {
+					cbase._component = null;
+				}
 				base = diff(cbase, rendered, context, mountAll || !isUpdate, initialBase && initialBase.parentNode, true);
 			}
 		}
@@ -164,8 +167,11 @@ export function renderComponent(component, opts, mountAll, isChild) {
 			while ((t=t._parentComponent)) {
 				(componentRef = t).base = base;
 			}
-			base._component = componentRef;
-			base._componentConstructor = componentRef.constructor;
+			// ie8 的 textElement 不允许设置属性
+			if (!(isIE8 && base.nodeType === 3)) {
+				base._component = componentRef;
+				base._componentConstructor = componentRef.constructor;
+			}
 		}
 	}
 

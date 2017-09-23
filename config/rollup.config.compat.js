@@ -13,9 +13,9 @@ let format = process.env.FORMAT==='es' ? 'es' : 'umd';
 export default {
 	entry: 'src/compat/index.js',
 	sourceMap: true,
-	moduleName: pkg.amdName,
+	moduleName: 'preactCompat',
 	exports: format==='es' ? null : 'default',
-	dest: format==='es' ? pkg.module : pkg.main,
+	dest: format==='es' ? pkg['compat:module'] : pkg['compat:main'],
 	format,
 	external,
 	useStrict: false,
@@ -46,7 +46,7 @@ export default {
 		nodeResolve({
 			jsnext: true,
 			main: true,
-			skip: external
+			// skip: external
 		}),
 		commonjs({
 			include: 'node_modules/**',

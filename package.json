@@ -7,6 +7,8 @@
   "module": "dist/preact.esm.js",
   "dev:main": "dist/preact.dev.js",
   "minified:main": "dist/preact.min.js",
+  "compat:main": "dist/preact-compat.js",
+  "compat:module": "dist/preact-compat.es.js",
   "scripts": {
     "clean": "rimraf dist/ devtools.js devtools.js.map debug.js debug.js.map",
     "copy-flow-definition": "copyfiles -f src/preact.js.flow dist",
@@ -114,6 +116,7 @@
     "rimraf": "^2.5.3",
     "rollup": "^0.48.2",
     "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.1",
     "rollup-plugin-memory": "^2.0.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "sinon": "^2.2.0",

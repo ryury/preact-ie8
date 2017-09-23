@@ -16,6 +16,7 @@ module.exports = function(config) {
       'http://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.js',
       'http://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.js',
       '../dist/preact.js',
+      '../dist/preact-compat.js',
       './ie8/index.js'
     ],
     preprocessors: {

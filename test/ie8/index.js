@@ -33,6 +33,7 @@ beforeAll (() => {
   })
 }) 
 
+// require('../../src/compat/index')
 
 const testsContext = require.context('./', true, /\.spec$/)
 testsContext.keys().forEach(testsContext)

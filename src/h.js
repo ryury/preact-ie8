@@ -1,5 +1,6 @@
 import { VNode } from './vnode';
 import options from './options';
+import { isIE8 } from './util/env'
 
 
 const stack = [];
@@ -52,6 +53,11 @@ export function h(nodeName, attributes) {
 	p.children = children;
 	p.attributes = attributes==null ? undefined : attributes;
 	p.key = attributes==null ? undefined : attributes.key;
+
+	if (isIE8 && VNode.prototype.preactCompatUpgraded !== undefined) {
+		p.type = nodeName;
+		p.props = p.attributes;
+	}
 
 	// if a "vnode hook" is defined, pass every created VNode to it
 	if (options.vnode!==undefined) options.vnode(p);

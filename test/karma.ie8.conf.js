@@ -5,7 +5,8 @@ require('./karma.conf')({
 })
 
 base.webpack.externals = {
-  preact: 'preact'
+  preact: 'preact',
+  preactCompat: 'preactCompat'
 }
 
 module.exports = function(config) {

@@ -45,15 +45,12 @@ VNode.prototype.$$typeof = REACT_ELEMENT_TYPE;
 VNode.prototype.preactCompatUpgraded = false;
 VNode.prototype.preactCompatNormalized = false;
 
-if (isIE8) {
-	VNode.prototype.type
-} else {
+if (!isIE8) {
 	Object.defineProperty(VNode.prototype, 'type', {
 		get() { return this.nodeName; },
 		set(v) { this.nodeName = v; },
 		configurable:true
 	});
-	
 	Object.defineProperty(VNode.prototype, 'props', {
 		get() { return this.attributes; },
 		set(v) { this.attributes = v; },
@@ -114,6 +111,7 @@ function handleComponentVNode(vnode) {
 	vnode.attributes = {};
 	if (tag.defaultProps) extend(vnode.attributes, tag.defaultProps);
 	if (a) extend(vnode.attributes, a);
+	if (isIE8 && vnode.preactCompatUpgraded !== undefined) vnode.props = vnode.attributes
 }
 
 function handleElementVNode(vnode, a) {

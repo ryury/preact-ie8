@@ -1,7 +1,7 @@
 import { SYNC_RENDER, NO_RENDER, FORCE_RENDER, ASYNC_RENDER, ATTR_KEY } from '../constants';
 import options from '../options';
 import { extend } from '../util';
-import { isIE8 } from '../util/env'
+import { isIE8 } from '../util/env';
 import { enqueueRender } from '../render-queue';
 import { getNodeProps } from './index';
 import { diff, mounts, diffLevel, flushMounts, recollectNodeTree, removeChildren } from './diff';

@@ -91,6 +91,10 @@ preact.options.vnode = function (vnode) {
 		var tag = vnode.nodeName,
 		    attrs = vnode.attributes = extend({}, vnode.attributes);
 
+		if (isIE8) {
+			vnode.type = tag;
+			vnode.props = vnode.attributes;
+		}
 		if (typeof tag === 'function') {
 			if (tag[COMPONENT_WRAPPER_KEY] === true || tag.prototype && 'isReactComponent' in tag.prototype) {
 				if (vnode.children && String(vnode.children) === '') vnode.children = undefined;
@@ -124,6 +128,9 @@ function handleComponentVNode(vnode) {
 	    a = vnode.attributes;
 
 	vnode.attributes = {};
+	if (isIE8 && vnode.preactCompatUpgraded !== undefined) {
+		vnode.props = vnode.attributes;
+	}
 	if (tag.defaultProps) extend(vnode.attributes, tag.defaultProps);
 	if (a) extend(vnode.attributes, a);
 }
@@ -364,7 +371,7 @@ function applyEventNormalization(_ref) {
 		delete attributes[props.ondoubleclick];
 	}
 	// for *textual inputs* (incl textarea), normalize `onChange` -> `onInput`:
-	if (props.onchange && (nodeName === 'textarea' || nodeName.toLowerCase() === 'input' && !/^fil|che|rad/i.test(attributes.type))) {
+	if (props.onchange && !isIE8 && (nodeName === 'textarea' || nodeName.toLowerCase() === 'input' && !/^fil|che|rad/i.test(attributes.type))) {
 		var normalized = props.oninput || 'oninput';
 		if (!attributes[normalized]) {
 			attributes[normalized] = multihook([attributes[normalized], attributes[props.onchange]]);
@@ -377,7 +384,9 @@ function applyClassName(vnode) {
 	var a = vnode.attributes || (vnode.attributes = {});
 	classNameDescriptor.enumerable = 'className' in a;
 	if (a.className) a['class'] = a.className;
-	Object.defineProperty(a, 'className', classNameDescriptor);
+	if (!isIE8) {
+		Object.defineProperty(a, 'className', classNameDescriptor);
+	}
 }
 
 var classNameDescriptor = {
@@ -390,7 +399,7 @@ var classNameDescriptor = {
 	}
 };
 
-function extend(base, props) {
+function extend(base) {
 	for (var _i3 = 1, obj; _i3 < arguments.length; _i3++) {
 		if (obj = arguments[_i3]) {
 			for (var key in obj) {
@@ -517,7 +526,7 @@ function newComponentHook(props, context) {
 	this.render = multihook([propsHook, beforeRender, this.render || 'render', afterRender]);
 }
 
-function propsHook(props, context) {
+function propsHook(props) {
 	if (!props) return;
 
 	// React annoyingly special-cases single children, and some react components are ridiculously strict about this.
@@ -544,7 +553,7 @@ function propsHook(props, context) {
 	}
 }
 
-function beforeRender(props) {
+function beforeRender() {
 	currentComponent = this;
 }
 

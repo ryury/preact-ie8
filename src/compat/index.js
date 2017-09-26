@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { render as preactRender, cloneElement as preactCloneElement, h, Component as PreactComponent, options } from 'preact';
 
-import { isIE8 } from '../util/env'
+import { isIE8 } from '../util/env';
 
 const version = '15.1.0'; // trick libraries to think we are react
 
@@ -74,7 +74,11 @@ options.vnode = vnode => {
 
 		let tag = vnode.nodeName,
 			attrs = vnode.attributes = extend({}, vnode.attributes);
-
+		
+		if (isIE8) {
+			vnode.type = tag;
+			vnode.props = vnode.attributes;
+		}
 		if (typeof tag==='function') {
 			if (tag[COMPONENT_WRAPPER_KEY]===true || (tag.prototype && 'isReactComponent' in tag.prototype)) {
 				if (vnode.children && String(vnode.children)==='') vnode.children = undefined;
@@ -109,9 +113,11 @@ function handleComponentVNode(vnode) {
 		a = vnode.attributes;
 
 	vnode.attributes = {};
+	if (isIE8 && vnode.preactCompatUpgraded !== undefined) {
+		vnode.props = vnode.attributes;
+	}
 	if (tag.defaultProps) extend(vnode.attributes, tag.defaultProps);
 	if (a) extend(vnode.attributes, a);
-	if (isIE8 && vnode.preactCompatUpgraded !== undefined) vnode.props = vnode.attributes
 }
 
 function handleElementVNode(vnode, a) {
@@ -351,7 +357,7 @@ function applyEventNormalization({ nodeName, attributes }) {
 		delete attributes[props.ondoubleclick];
 	}
 	// for *textual inputs* (incl textarea), normalize `onChange` -> `onInput`:
-	if (props.onchange && (nodeName==='textarea' || (nodeName.toLowerCase()==='input' && !/^fil|che|rad/i.test(attributes.type)))) {
+	if (props.onchange && !isIE8 && (nodeName==='textarea' || (nodeName.toLowerCase()==='input' && !/^fil|che|rad/i.test(attributes.type)))) {
 		let normalized = props.oninput || 'oninput';
 		if (!attributes[normalized]) {
 			attributes[normalized] = multihook([attributes[normalized], attributes[props.onchange]]);
@@ -365,7 +371,9 @@ function applyClassName(vnode) {
 	let a = vnode.attributes || (vnode.attributes = {});
 	classNameDescriptor.enumerable = 'className' in a;
 	if (a.className) a['class'] = a.className;
-	Object.defineProperty(a, 'className', classNameDescriptor);
+	if (!isIE8) {
+		Object.defineProperty(a, 'className', classNameDescriptor);
+	}
 }
 
 
@@ -375,7 +383,7 @@ let classNameDescriptor = {
 	set(v) { this['class'] = v; }
 };
 
-function extend(base, props) {
+function extend(base) {
 	for (let i=1, obj; i<arguments.length; i++) {
 		if ((obj = arguments[i])) {
 			for (let key in obj) {
@@ -509,7 +517,7 @@ function newComponentHook(props, context) {
 }
 
 
-function propsHook(props, context) {
+function propsHook(props) {
 	if (!props) return;
 
 	// React annoyingly special-cases single children, and some react components are ridiculously strict about this.
@@ -537,7 +545,7 @@ function propsHook(props, context) {
 }
 
 
-function beforeRender(props) {
+function beforeRender() {
 	currentComponent = this;
 }
 

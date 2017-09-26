@@ -1,4 +1,4 @@
-const React = require('preact')
+const React = require('preactCompat')
 const {
 	render,
 	createClass,
@@ -8,7 +8,7 @@ const {
 	PropTypes,
 	unstable_renderSubtreeIntoContainer,
 	__spread
-} = require('preactCompat');
+} = React;
 
 describe('preact-compat', () => {
 	describe('render()', () => {
@@ -176,46 +176,43 @@ describe('preact-compat', () => {
 			expect(vnode.$$typeof).toBe($$typeof);
 			expect(vnode.type).toBe('div');
       expect(typeof vnode.props).toBe('object');
-      console.log(vnode.props)
-      console.log(vnode.attributes)
-			// expect(vnode.attributes).not.toBeUndefined()
-			// expect(vnode.props.children[0]).toBe('$$typeof', $$typeof);
-			// expect(vnode.props.children[0]).toBe('type', 'a');
-			// expect(vnode.props.children[0]).toBe('props').that.is.an('object');
-			// expect(vnode.props.children[0].props).to.eql({ children:['t'] });
+			expect(vnode.props).not.toBeUndefined()
+			expect(vnode.props.children[0].$$typeof).toBe($$typeof);
+			expect(vnode.props.children[0].type).toBe('a');
+			expect(typeof vnode.props.children[0].props).toBe('object');
+			expect(vnode.props.children[0].props).toEqual({ children:['t'] });
 		});
 
-		// it('should normalize onChange', () => {
-		// 	let props = { onChange(){} };
+		it('should normalize onChange', () => {
+			let props = { onChange(){} };
 
-		// 	function expectToBeNormalized(vnode, desc) {
-		// 		expect(vnode, desc).to.have.property('props').with.all.keys(['oninput'].concat(vnode.props.type ? 'type' : [])).and.property('oninput').that.is.a('function');
-		// 	}
+			function expectToBeNormalized(vnode, desc) {
+				expect(typeof vnode.props.onChange).toBe('function')
+				expect(Object.keys(vnode.props)).toEqual(['onChange'].concat(vnode.props.type ? 'type' : []))
+			}
 
-		// 	function expectToBeUnmodified(vnode, desc) {
-		// 		expect(vnode, desc).to.have.property('props').eql({ ...props, ...(vnode.props.type ? { type:vnode.props.type } : {}) });
-		// 	}
+			function expectToBeUnmodified(vnode) {
+				expect(vnode.props).toEqual({ ...props, ...(vnode.props.type ? { type:vnode.props.type } : {}) });
+			}
 
-		// 	expectToBeUnmodified(<div {...props} />, '<div>');
-		// 	expectToBeUnmodified(<input {...props} type="radio" />, '<input type="radio">');
-		// 	expectToBeUnmodified(<input {...props} type="checkbox" />, '<input type="checkbox">');
-		// 	expectToBeUnmodified(<input {...props} type="file" />, '<input type="file">');
+			expectToBeUnmodified(<div {...props} />, '<div>');
+			expectToBeUnmodified(<input {...props} type="radio" />, '<input type="radio">');
+			expectToBeUnmodified(<input {...props} type="checkbox" />, '<input type="checkbox">');
+			expectToBeUnmodified(<input {...props} type="file" />, '<input type="file">');
 
-		// 	expectToBeNormalized(<textarea {...props} />, '<textarea>');
-		// 	expectToBeNormalized(<input {...props} />, '<input>');
-		// 	expectToBeNormalized(<input {...props} type="text" />, '<input type="text">');
+			expectToBeNormalized(<textarea {...props} />, '<textarea>');
+			expectToBeNormalized(<input {...props} />, '<input>');
+			expectToBeNormalized(<input {...props} type="text" />, '<input type="text">');
 
-		// });
+		});
 	});
 
-	// describe('Component', () => {
-	// 	it('should be exported', () => {
-	// 		expect(React)
-	// 			.to.have.property('Component')
-	// 			.that.is.a('function')
-	// 			.that.equals(Component);
-	// 	});
-	// });
+	describe('Component', () => {
+		it('should be exported', () => {
+			expect(React.Component).toBe(Component)
+			expect(typeof React.Component).toBe('function')
+		});
+	});
 
 	// describe('PropTypes', () => {
 	// 	it('should be exported', () => {
@@ -226,107 +223,108 @@ describe('preact-compat', () => {
 	// 	});
 	// });
 
-	// describe('cloneElement', () => {
-	// 	it('should clone elements', () => {
-	// 		let element = <foo a="b" c="d">a<span>b</span></foo>;
-	// 		expect(cloneElement(element)).to.eql(element);
-	// 	});
+	describe('cloneElement', () => {
+		// it('should clone elements', () => {
+		// 	let element = <foo a="b" c="d">a<span>b</span></foo>;
+		// 	expect(cloneElement(element)).toEqual(element);
+		// });
 
-	// 	it('should support props.children', () => {
-	// 		let element = <foo children={<span>b</span>}></foo>;
-	// 		expect(cloneElement(element)).to.eql(element);
-	// 	});
+		// it('should support props.children', () => {
+		// 	let element = <foo children={<span>b</span>}></foo>;
+		// 	expect(cloneElement(element)).to.eql(element);
+		// });
 
-	// 	it('children take precedence over props.children', () => {
-	// 		let element = <foo children={<span>c</span>}><div>b</div></foo>;
-	// 		let clone = cloneElement(element);
-	// 		expect(clone).to.eql(element);
-	// 		expect(clone.children[0].nodeName).to.eql('div');
-	// 	});
+		// it('children take precedence over props.children', () => {
+		// 	let element = <foo children={<span>c</span>}><div>b</div></foo>;
+		// 	let clone = cloneElement(element);
+		// 	expect(clone).to.eql(element);
+		// 	expect(clone.children[0].nodeName).to.eql('div');
+		// });
 
-	// 	it('should support children in prop argument', () => {
-	// 		let element = <foo></foo>;
-	// 		let children = [<span>b</span>];
-	// 		let clone = cloneElement(element, { children });
-	// 		expect(clone.children).to.eql(children);
-	// 	});
+		// it('should support children in prop argument', () => {
+		// 	let element = <foo></foo>;
+		// 	let children = [<span>b</span>];
+		// 	let clone = cloneElement(element, { children });
+		// 	expect(clone.children).to.eql(children);
+		// });
 
-	// 	it('children argument takes precedence over props.children', () => {
-	// 		let element = <foo></foo>;
-	// 		let childrenA = [<span>b</span>];
-	// 		let childrenB = [<div>c</div>];
-	// 		let clone = cloneElement(element, { children: childrenA }, ...childrenB);
-	// 		expect(clone.children).to.eql(childrenB);
-	// 	});
+		// it('children argument takes precedence over props.children', () => {
+		// 	let element = <foo></foo>;
+		// 	let childrenA = [<span>b</span>];
+		// 	let childrenB = [<div>c</div>];
+		// 	let clone = cloneElement(element, { children: childrenA }, ...childrenB);
+		// 	expect(clone.children).to.eql(childrenB);
+		// });
 
-	// 	it('children argument takes precedence over props.children even if falsey', () => {
-	// 		let element = <foo></foo>;
-	// 		let childrenA = [<span>b</span>];
-	// 		let clone = cloneElement(element, { children: childrenA }, undefined);
-	// 		expect(clone.children).to.eql(undefined);
-	// 	});
-	// });
+		// it('children argument takes precedence over props.children even if falsey', () => {
+		// 	let element = <foo></foo>;
+		// 	let childrenA = [<span>b</span>];
+		// 	let clone = cloneElement(element, { children: childrenA }, undefined);
+		// 	expect(clone.children).to.eql(undefined);
+		// });
+	});
 
-	// describe('unstable_renderSubtreeIntoContainer', () => {
-	// 	class Inner extends Component {
-	// 		render() {
-	// 			return null;
-	// 		}
-	// 		getNode() {
-	// 			return 'inner';
-	// 		}
-	// 	}
+	describe('unstable_renderSubtreeIntoContainer', () => {
+		// class Inner extends Component {
+		// 	render() {
+		// 		return null;
+		// 	}
+		// 	getNode() {
+		// 		return 'inner';
+		// 	}
+		// }
 
-	// 	it('should export instance', () => {
-	// 		class App extends Component {
-	// 			render() {
-	// 				return null;
-	// 			}
-	// 			componentDidMount() {
-	// 				this.renderInner();
-	// 			}
-	// 			renderInner() {
-	// 				const wrapper = document.createElement('div');
-	// 				this.inner = unstable_renderSubtreeIntoContainer(this, <Inner/>, wrapper);
-	// 			}
-	// 		}
-	// 		const root = document.createElement('div');
-	// 		const app = render(<App/>, root);
-	// 		expect(typeof app.inner.getNode === 'function').to.equal(true);
-	// 	});
+		// it('should export instance', () => {
+		// 	class App extends Component {
+		// 		render() {
+		// 			return null;
+		// 		}
+		// 		componentDidMount() {
+		// 			this.renderInner();
+		// 		}
+		// 		renderInner() {
+		// 			const wrapper = document.createElement('div');
+		// 			this.inner = unstable_renderSubtreeIntoContainer(this, <Inner/>, wrapper);
+		// 		}
+		// 	}
+		// 	const root = document.createElement('div');
+		// 	const app = render(<App/>, root);
+		// 	console.log(app.inner)
+		// 	// expect(typeof app.inner.getNode === 'function').toEqual(true);
+		// });
 
-	// 	it('should there must be a context in callback', () => {
-	// 		class App extends Component {
-	// 			render() {
-	// 				return null;
-	// 			}
-	// 			componentDidMount() {
-	// 				this.renderInner();
-	// 			}
-	// 			renderInner() {
-	// 				const wrapper = document.createElement('div');
-	// 				const self = this;
-	// 				unstable_renderSubtreeIntoContainer(this, <Inner/>, wrapper, function() {
-	// 					self.inner = this;
-	// 				});
-	// 			}
-	// 		}
-	// 		const root = document.createElement('div');
-	// 		const app = render(<App/>, root);
-	// 		expect(typeof app.inner.getNode === 'function').to.equal(true);
-	// 	});
-	// });
+		// it('should there must be a context in callback', () => {
+		// 	class App extends Component {
+		// 		render() {
+		// 			return null;
+		// 		}
+		// 		componentDidMount() {
+		// 			this.renderInner();
+		// 		}
+		// 		renderInner() {
+		// 			const wrapper = document.createElement('div');
+		// 			const self = this;
+		// 			unstable_renderSubtreeIntoContainer(this, <Inner/>, wrapper, function() {
+		// 				self.inner = this;
+		// 			});
+		// 		}
+		// 	}
+		// 	const root = document.createElement('div');
+		// 	const app = render(<App/>, root);
+		// 	expect(typeof app.inner.getNode === 'function').to.equal(true);
+		// });
+	});
 
-	// describe('Unsupported hidden internal __spread API', () => {
-	// 	it('should work with multiple objects', () => {
-	// 		const start = {};
-	// 		const result = React.__spread(start, {one: 1, two: 3}, {two: 2});
-	// 		expect(result).to.equal(start);
-	// 		expect(start).to.deep.equal({ one: 1, two: 2});
-	// 	});
+	describe('Unsupported hidden internal __spread API', () => {
+		it('should work with multiple objects', () => {
+			const start = {};
+			const result = React.__spread(start, {one: 1, two: 3}, {two: 2});
+			expect(result).toEqual(start);
+			expect(start).toEqual({ one: 1, two: 2});
+		});
 
-	// 	it('should be exported on default and as __spread', () => {
-	// 		expect(__spread).to.equal(React.__spread);
-	// 	});
-	// });
+		it('should be exported on default and as __spread', () => {
+			expect(__spread).toEqual(React.__spread);
+		});
+	});
 });

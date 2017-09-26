@@ -19,10 +19,6 @@
         p.children = children;
         p.attributes = null == attributes ? void 0 : attributes;
         p.key = null == attributes ? void 0 : attributes.key;
-        if (isIE8 && void 0 !== VNode.prototype.preactCompatUpgraded) {
-            p.type = nodeName;
-            p.props = p.attributes;
-        }
         if (void 0 !== options.vnode) options.vnode(p);
         return p;
     }
